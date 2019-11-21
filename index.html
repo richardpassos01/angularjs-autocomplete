@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AngularJS Autocomplete</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.0/angular.min.js"></script>
+    <style type="text/css">
+        #pais {
+            max-width: 29em;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0;
+        }
+
+        .my-class {
+            display: block;
+            max-height: 200px;
+            padding: 1em;
+        }
+
+        ul {
+            z-index: 99;
+            display: none;
+            padding: 0;
+            list-style-type: none;
+            margin: 0;
+            overflow: hidden;
+            overflow-y: scroll;
+            border-bottom-right-radius: 35px;
+            border-bottom-left-radius: 35px;
+            -moz-box-shadow: 0px 5px 8px rgba(0, 0, 0, 0.3);
+            -khtml-box-shadow: 0px 5px 8px rgba(0, 0, 0, 0.3);
+            -webkit-box-shadow: 0px 5px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0px 5px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        li {
+            margin-top: -1px;
+            padding: 12px;
+            border: none !important;
+            display: block;
+            cursor: pointer;
+            outline: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .outputLists.focus {
+            border-radius: 3em;
+            background: #337ab7;
+            color: white;
+        }
+
+        .form-control-2 {
+            display: block;
+            width: 100%;
+            font-size: 14px;
+            line-height: 1.42857143;
+            border: 1px solid #ccc;
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        #country {
+            background: none;
+            padding: 2px 2px 1px;
+            border-width: 0px 0 1px 0px;
+            height: 30px;
+            -ms-flex-preferred-size: 26px;
+            border-radius: 0;
+            border-style: solid;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container col-md-6">
+        <div ng-app="myApp" ng-controller="myCtrl" ng-init="loadCountry()">
+            <label>Enter Country Name</label>
+            <div id="pais">
+                <input type="text" name="country" ng-keydown="handleKeyDown($event)" id="country" ng-model="country"
+                    ng-change="complete(country)" ng-focus="myChange(country)" ng-blur="myChange(country)"
+                    class="form-control-2" />
+                <ul ng-class="{'my-class': minhaVar }" class="outoutList" tabindex="0"
+                    ng-keydown="handleKeyDown($event)">
+                    <li class="outputLists" data-item="true" data-index="0" c
+                        ng-class="{'focus': focusedIndex == $index}" ng-mouseover="$parent.focusedIndex = $index"
+                        data-index="0" class="list-group-item-teste" ng-repeat="countrydata in filterCountry"
+                        ng-click="fillTextbox(countrydata)">{{countrydata}}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        var app = angular.module("myApp", []);
+
+        app.controller('myCtrl', function ($scope, $http, $element) {
+            var listOfDropDownItems = $element.find('ul')[0];
+            var scroll = 30;
+
+            $scope.focusedIndex = 0;
+            $scope.minhaVar = false;
+
+            $scope.myChange = function (string) {
+                if (!string) {
+                    $scope.minhaVar = false;
+                }
+            }
+
+            $scope.complete = function (string) {
+                var output = [];
+                angular.forEach($scope.countryList, function (country) {
+                    if (country.name.toLowerCase().indexOf(string.toLowerCase()) >= 0) {
+                        output.push(country.name);
+                    }
+                });
+
+                if (output.length) {
+                    $scope.focusedIndex = 0;
+                    $scope.minhaVar = true;
+                    $scope.filterCountry = output;
+                }
+
+                if (!string) {
+                    $scope.minhaVar = false;
+                }
+            }
+            $scope.fillTextbox = function (string) {
+                $scope.selectedValue = string;
+
+                $scope.minhaVar = false;
+                $scope.country = string;
+                $scope.filterCountry = null;
+            }
+
+            $scope.handleKeyDown = function ($event) {
+                var keyCode = $event.keyCode;
+                if (keyCode === 40) {
+                    listOfDropDownItems.scrollTop += scroll;
+                    // Down
+                    $event.preventDefault();
+                    if ($scope.focusedIndex !== $scope.filterCountry.length - 1) {
+                        $scope.focusedIndex++;
+                    }
+                }
+                if (keyCode === 38) {
+                    listOfDropDownItems.scrollTop -= scroll;
+                    // Up
+                    $event.preventDefault();
+                    if ($scope.focusedIndex !== 0) {
+                        $scope.focusedIndex--;
+                    }
+                }
+                if (keyCode === 13 && $scope.focusedIndex >= 0) {
+                    // Enter
+                    $event.preventDefault();
+                    $scope.fillTextbox($scope.filterCountry[$scope.focusedIndex]);
+                }
+            };
+
+            $scope.countryList = [{
+                    name: "Afghanistan",
+                    codiPais: 1
+                },
+                {
+                    name: "Argentina",
+                    codiPais: 1
+                },
+                {
+                    name: "Armenia",
+                    codiPais: 1
+                },
+                {
+                    name: "Aruba",
+                    codiPais: 1
+                },
+                {
+                    name: "Australia",
+                    codiPais: 1
+                },
+                {
+                    name: "Austria",
+                    codiPais: 1
+                },
+                {
+                    name: "Azerbaijan",
+                    codiPais: 1
+                },
+                {
+                    name: "Bahamas",
+                    codiPais: 1
+                },
+                {
+                    name: "Bahrain",
+                    codiPais: 1
+                },
+                {
+                    name: "Bangladesh",
+                    codiPais: 1
+                },
+                {
+                    name: "Barbados",
+                    codiPais: 1
+                },
+                {
+                    name: "Belarus",
+                    codiPais: 1
+                },
+                {
+                    name: "Belgium",
+                    codiPais: 1
+                },
+                {
+                    name: "Belize",
+                    codiPais: 1
+                },
+                {
+                    name: "Benin",
+                    codiPais: 1
+                },
+                {
+                    name: "Bermuda",
+                    codiPais: 1
+                },
+                {
+                    name: "Bhutan",
+                    codiPais: 1
+                },
+                {
+                    name: "Bolivia",
+                    codiPais: 1
+                },
+
+                {
+                    name: "Botswana",
+                    codiPais: 1
+                },
+                {
+                    name: "Brazil",
+                    codiPais: 1
+                },
+
+                {
+                    name: "Brunei",
+                    codiPais: 1
+                },
+                {
+                    name: "Bulgaria",
+                    codiPais: 1
+                },
+                {
+                    name: "Burkina Fas   o",
+                    codiPais: 1
+                },
+                {
+                    name: "Burundi",
+                    codiPais: 1
+                },
+                {
+                    name: "Cambodia",
+                    codiPais: 1
+                },
+                {
+                    name: "Canada",
+                    codiPais: 1
+                },
+                {
+                    name: "Cameroon",
+                    codiPais: 1
+                },
+                {
+                    name: "Cape Verd e",
+                    codiPais: 1
+                },
+                {
+                    name: "Cayman Island s",
+                    codiPais: 1
+                },
+                {
+                    name: "Chad",
+                    codiPais: 1
+                },
+                {
+                    name: "Chile",
+                    codiPais: 1
+                },
+                {
+                    name: "China"
+                }
+            ];
+        });
+    </script>
+</body>
+</html>
